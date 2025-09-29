@@ -10,28 +10,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      # Checkout your repository
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
+      # Set up Java JDK
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
 
+      # Build APK (replace with real Gradle build later)
       - name: Build APK
         run: |
           mkdir -p app/build/outputs/apk/release
           echo "Fake APK" > app/build/outputs/apk/release/app-release.apk
 
+      # Create GitHub Release
       - name: Create GitHub Release
         id: create_release
         uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref_name }}
           release_name: MauChat Release ${{ github.ref_name }}
           draft: false
           prerelease: false
 
+      # Upload APK to the Release
       - name: Upload APK to Release
         uses: actions/upload-release-asset@v1
         with:
@@ -39,4 +47,3 @@ jobs:
           asset_path: app/build/outputs/apk/release/app-release.apk
           asset_name: app-release.apk
           asset_content_type: application/vnd.android.package-archive
-          
