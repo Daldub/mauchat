@@ -1,16 +1,42 @@
-- name: Create GitHub Release
-  id: create_release
-  uses: actions/create-release@v1
-  with:
-    tag_name: ${{ github.ref_name }}
-    release_name: MauChat Release ${{ github.ref_name }}
-    draft: false
-    prerelease: false
+name: Build MauChat APK
 
-- name: Upload APK to Release
-  uses: actions/upload-release-asset@v1
-  with:
-    upload_url: ${{ steps.create_release.outputs.upload_url }}
-    asset_path: app/build/outputs/apk/release/app-release.apk
-    asset_name: app-release.apk
-    asset_content_type: application/vnd.android.package-archive
+on:
+  push:
+    tags:
+      - 'release-*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build APK
+        run: |
+          mkdir -p app/build/outputs/apk/release
+          echo "Fake APK" > app/build/outputs/apk/release/app-release.apk
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: MauChat Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+
+      - name: Upload APK to Release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: app/build/outputs/apk/release/app-release.apk
+          asset_name: app-release.apk
+          asset_content_type: application/vnd.android.package-archive
+          
